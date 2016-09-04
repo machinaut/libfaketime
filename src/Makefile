@@ -58,8 +58,8 @@
 CC ?= gcc
 INSTALL ?= install
 
-PREFIX ?= /usr/local
-LIBDIRNAME ?= /lib/faketime
+PREFIX ?= /usr/
+LIBDIRNAME ?= /lib/
 PLATFORM ?=$(shell uname)
 
 CFLAGS += -std=gnu99 -Wall -Wextra -Werror -DFAKE_STAT -DFAKE_SLEEP -DFAKE_TIMERS -DFAKE_INTERNAL_CALLS -fPIC -DPREFIX='"'$(PREFIX)'"' -DLIBDIRNAME='"'$(LIBDIRNAME)'"'
@@ -81,8 +81,8 @@ SRC = libfaketime.c
 LIBS_OBJ = libfaketime.o libfaketimeMT.o
 BINS = faketime
 
-SONAME = 1
-LIBS = libfaketime.so.${SONAME} libfaketimeMT.so.${SONAME}
+SONAME = 6
+LIBS = libf.so.${SONAME} libfMT.so.${SONAME}
 
 all: ${LIBS} ${BINS}
 
@@ -91,7 +91,10 @@ libfaketimeMT.o: EXTRA_FLAGS := -DPTHREAD -DPTHREAD_SINGLETHREADED_TIME
 ${LIBS_OBJ}: libfaketime.c
 	${CC} -o $@ -c ${CFLAGS} ${EXTRA_FLAGS} $<
 
-%.so.${SONAME}: %.o libfaketime.map
+libfMT.so.${SONAME}: libfaketimeMT.o libfaketime.map
+	${CC} -o $@ -Wl,-soname,$@ ${LDFLAGS} ${LIB_LDFLAGS} $< ${LDADD}
+
+libf.so.${SONAME}: libfaketime.o libfaketime.map
 	${CC} -o $@ -Wl,-soname,$@ ${LDFLAGS} ${LIB_LDFLAGS} $< ${LDADD}
 
 ${BINS}: faketime.c
